@@ -1,9 +1,0 @@
-export SUPABASE_URL=http://127.0.0.1:54321
-
-export SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS>
-
-export DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
-
-export STRIPE_PUBLISHABLE_KEY=pk_test_kwuBjnr1vunSwxxmgfAj8FbY
-
-export OPENAI_API_KEY=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
