@@ -3,6 +3,24 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
 
+  sourcemap: {
+    server: true,
+    client: true,
+  },
+
+  supabase: {
+    redirect: false,
+
+    url: process.env.SUPABASE_URL,
+    key: process.env.SUPABASE_KEY,
+    redirectOptions: {
+      login: '/login',
+      callback: "/confirm",
+      exclude: ['/', '/signup', 'passwordreset'],
+      cookieRedirect: true
+    },
+  },
+
   modules: [
     '@nuxt/fonts',
     '@nuxt/icon',

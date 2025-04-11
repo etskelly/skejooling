@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'auth'
+  layout: 'auth',
 })
 
 useSeoMeta({
@@ -11,7 +11,7 @@ interface FormState {
   email: string
   forename: string
   surname: string
-  orgName: string
+  orgname: string
   password: string
   passwordConfirmation: string
 }
@@ -40,7 +40,7 @@ const fields = [{
   placeholder: 'Enter your surname',
   required: true
 }, {
-  name: 'orgName',
+  name: 'orgname',
   type: 'text' as const,
   label: 'Business Name',
   placeholder: 'Enter your business name',
@@ -59,12 +59,12 @@ const fields = [{
   required: true
 }]
 
-const validate = (state: FormState) => {
+const validate = (state: Record<string, any>) => {
   const errors = []
   if (!state.email) errors.push({ path: 'email', message: 'Email is required' })
   if (!state.forename) errors.push({ path: 'forename', message: 'Forename is required' })
   if (!state.surname) errors.push({ path: 'surname', message: 'Surname is required' })
-  if (!state.orgName) errors.push({ path: 'orgName', message: 'Business name is required' })
+  if (!state.orgname) errors.push({ path: 'orgname', message: 'Business name is required' })
   if (!state.password) errors.push({ path: 'password', message: 'Password is required' })
   if (!state.passwordConfirmation) errors.push({ path: 'passwordConfirmation', message: 'Password confirmation is required' })
   if (state.password !== state.passwordConfirmation) {
@@ -84,32 +84,71 @@ const providers = [{
 
 const signUp = async (event: { data: FormState }) => {
   try {
-    const { error } = await supabase.auth.signUp({
+    console.log('Attempting to sign up with:', {
+      email: event.data.email,
+      password: '********',
+      options: {
+        data: {
+          forename: event.data.forename,
+          surname: event.data.surname,
+          orgname: event.data.orgname,
+        },
+      },
+    })
+    
+    // Try a simpler signup approach first
+    const { data, error } = await supabase.auth.signUp({
       email: event.data.email,
       password: event.data.password,
       options: {
         data: {
           forename: event.data.forename,
           surname: event.data.surname,
-          orgname: event.data.orgName,
-          status: 'exists'
+          orgname: event.data.orgname
         },
       },
     })
 
+    console.log('Signup response:', { data, error })
+
     if (error) {
-      debugger
-      alert("Some error")
-      throw error
+      console.error('Signup error:', error)
+      console.error('Error details:', {
+        message: error.message,
+        status: error?.status,
+        name: error?.name,
+        stack: error?.stack
+      })
+      
+      // If we get a database error, try a different approach
+      if (error.message.includes('Database error')) {
+        console.log('Trying alternative signup approach...')
+        
+        // Try with minimal metadata
+        const { data: altData, error: altError } = await supabase.auth.signUp({
+          email: event.data.email,
+          password: event.data.password
+        })
+        
+        if (altError) {
+          console.error('Alternative signup error:', altError)
+          errorMsg.value = altError.message || 'An error occurred during signup'
+          throw altError
+        } else {
+          console.log('Alternative signup successful:', altData)
+          successMsg.value = "Registration successful! Please check your email to confirm your account."
+        }
+      } else {
+        errorMsg.value = error.message || 'An error occurred during signup'
+        throw error
+      }
     } else {
-      debugger
-      alert("No error")
-      successMsg.value = "Registered Successfully"
+      console.log('Signup successful:', data)
+      successMsg.value = "Registration successful! Please check your email to confirm your account."
     }
   } catch (error: any) {
-    debugger
-    alert('Some proper error')
-    errorMsg.value = error.message || error.fullMessage
+    console.error('Caught error during signup:', error)
+    errorMsg.value = error.message || 'An unexpected error occurred'
   }
 }
 </script>

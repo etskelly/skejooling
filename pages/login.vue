@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'auth'
+  layout: 'auth',
 })
 
 useSeoMeta({
@@ -33,7 +33,7 @@ const fields = [{
   type: 'checkbox' as const
 }]
 
-const validate = (state) => {
+const validate = (state: any) => {
   const errors = []
   if (!state.email) errors.push({ path: 'email', message: 'Email is required' })
   if (!state.password) errors.push({ path: 'password', message: 'Password is required' })
@@ -79,38 +79,24 @@ const signInWithPassword = async (event: { data: FormState }) => {
 <!-- eslint-disable vue/singleline-html-element-content-newline -->
 <template>
   <UCard class="max-w-sm w-full bg-white/75 dark:bg-white/5 backdrop-blur">
-    <UAuthForm
-      :fields="fields"
-      :validate="validate"
-      :providers="providers"
-      title="Welcome back"
-      align="top"
-      icon="i-heroicons-lock-closed"
-      :ui="{ base: 'text-center', footer: 'text-center' }"
-      :submit-button="{ trailingIcon: 'i-heroicons-arrow-right-20-solid' }"
-      @submit="signInWithPassword"
-    >
+    <UAuthForm :fields="fields" :validate="validate" :providers="providers" title="Welcome back" align="top"
+      icon="i-heroicons-lock-closed" :ui="{ base: 'text-center', footer: 'text-center' }"
+      :submit-button="{ trailingIcon: 'i-heroicons-arrow-right-20-solid' }" @submit="signInWithPassword">
       <template #description>
-        Don't have an account? <NuxtLink
-          to="/signup"
-          class="text-primary font-medium"
-        >Sign up</NuxtLink>.
+        Don't have an account? <NuxtLink to="/signup" class="text-primary font-medium">Sign up</NuxtLink>.
       </template>
 
       <template #password-hint>
-        <NuxtLink
-          to="/passwordreset"
-          class="text-primary font-medium"
-        >Forgot password?</NuxtLink>
+        <NuxtLink to="/passwordreset" class="text-primary font-medium">Forgot password?</NuxtLink>
       </template>
 
       <template #footer>
         <div class="flex items-center justify-between mb-12" v-if="errorMsg">
-            <div class="flex items-center">
-              <a class="font-medium no-underline ml-2 text-red text-right cursor-pointer">{{ errorMsg }}</a>
-            </div>
+          <div class="flex items-center">
+            <a class="font-medium no-underline ml-2 text-red text-right cursor-pointer">{{ errorMsg }}</a>
           </div>
-          </template>
+        </div>
+      </template>
     </UAuthForm>
   </UCard>
 </template>
