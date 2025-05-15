@@ -7,18 +7,27 @@ useHead({
 </script>
 
 <template>
-  <div class="h-screen flex items-center justify-center overlay">
-    <div class="gradient" />
+  <div class="min-h-screen overlay">
+    <UHeader>
+      <template #left>
+        <NuxtLink to="/" class="flex items-center">
+          Nuxt UI Pro <UBadge
+            label="SaaS"
+            variant="subtle"
+            class="mb-0.5 ml-2"
+          />
+        </NuxtLink>
+      </template>
 
-    <UButton
-      icon="i-heroicons-home"
-      label="Home"
-      to="/"
-      color="black"
-      class="absolute top-4"
-    />
+      <!-- Add empty right/panel slots to prevent default buttons/icons showing -->
+      <template #right />
+      <template #panel />
+    </UHeader>
 
-    <slot />
+    <UMain class="flex items-center justify-center">
+      <div class="gradient" />
+      <slot />
+    </UMain>
   </div>
 </template>
 

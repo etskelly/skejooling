@@ -1,0 +1,75 @@
+<!-- <template>
+    <div>
+        <h2>Add Person</h2>
+        <form @submit.prevent="addPerson">
+            <p-input-text v-model="newPerson.name" placeholder="Name" />
+            <p-input-text v-model="newPerson.email" placeholder="Email" />
+            <p-button type="submit" label="Add" />
+        </form>
+
+        <h2>People List</h2>
+        <p-data-table :value="people">
+            <p-column field="name" header="Name"></p-column>
+            <p-column field="email" header="Email"></p-column>
+        </p-data-table>
+    </div>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import { InputText } from 'primevue/inputtext';
+import { Button } from 'primevue/button';
+import { DataTable } from 'primevue/datatable';
+import { Column } from 'primevue/column';
+
+import { supabase } from '../supabaseClient';
+
+const loadPeople = async () => {
+    let { data: peopleData, error } = await supabase
+        .from('people')
+        .select('*');
+    if (error) {
+        console.error('Error loading people:', error);
+    } else {
+        people.value = peopleData;
+    }
+};
+
+const savePerson = async (person) => {
+    let { data, error } = await supabase
+        .from('people')
+        .insert([person]);
+    if (error) {
+        console.error('Error saving person:', error);
+    } else {
+        people.value.push(data[0]);
+    }
+};
+
+const updatePerson = async (person) => {
+    let { data, error } = await supabase
+        .from('people')
+        .update(person)
+        .eq('id', person.id);
+    if (error) {
+        console.error('Error updating person:', error);
+    } else {
+        const index = people.value.findIndex(p => p.id === person.id);
+        if (index !== -1) {
+            people.value[index] = data[0];
+        }
+    }
+};
+
+onMounted(() => {
+    loadPeople();
+});
+
+
+</script>
+
+<style scoped>
+form {
+    margin-bottom: 20px;
+}
+</style> -->

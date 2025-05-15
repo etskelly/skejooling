@@ -20,6 +20,7 @@ const errorMsg = ref<string | null>(null)
 const successMsg = ref<string | null>(null)
 
 const supabase = useSupabaseClient()
+const router = useRouter()
 
 const fields = [{
   name: 'email',
@@ -145,6 +146,7 @@ const signUp = async (event: { data: FormState }) => {
     } else {
       console.log('Signup successful:', data)
       successMsg.value = "Registration successful! Please check your email to confirm your account."
+      await router.push('/subscription')
     }
   } catch (error: any) {
     console.error('Caught error during signup:', error)
