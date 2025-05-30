@@ -26,9 +26,9 @@
                                     class="z-30 relative flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all border"
                                     @click="handleNavClick(item)"
                                 >
-                                    <i :class="item.icon" />
+                                    <UIcon :name="item.icon.replace('pi pi-', 'i-')" />
                                     <span class="flex-1 font-medium">{{ item.label }}</span>
-                                    <i v-if="item?.subMenu" class="pi pi-chevron-down text-sm leading-none" />
+                                    <UIcon v-if="item?.subMenu" name="i-heroicons-chevron-down-20-solid" class="text-sm leading-none" />
                                 </div>
                                 <div
                                     v-if="selectedNav === item.label && item?.subMenu"
@@ -76,15 +76,15 @@
                             class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all border"
                             @click="handleNavClick(item)"
                         >
-                            <i :class="item.icon" />
+                            <UIcon :name="item.icon.replace('pi pi-', 'i-')" />
                             <span class="flex-1 font-medium">{{ item.label }}</span>
-                            <i v-if="item?.subMenu" class="pi pi-chevron-down text-sm leading-none" />
+                            <UIcon v-if="item?.subMenu" name="i-heroicons-chevron-down-20-solid" class="text-sm leading-none" />
                         </li>
                     </template>
                 </ul>
                 <div class="w-[calc(100%-3rem)] mx-auto h-[1px] bg-surface-200 dark:bg-surface-700 px-6" />
                 <div class="p-6 flex items-center gap-3 cursor-pointer">
-                    <Avatar image="https://fqjltiegiezfetthbags.supabase.co/storage/v1/render/image/public/block.images/blocks/avatars/circle/avatar-f-1.png" size="large" shape="circle" class="!w-9 !h-9" />
+                    <UAvatar src="https://fqjltiegiezfetthbags.supabase.co/storage/v1/render/image/public/block.images/blocks/avatars/circle/avatar-f-1.png" size="lg" class="!w-9 !h-9" />
                     <div>
                         <div class="text-sm font-semibold text-surface-900 dark:text-surface-0">Amy Elsner</div>
                         <span class="text-xs text-surface-600 dark:text-surface-400 leading-none">Description</span>
@@ -97,17 +97,10 @@
             <div class="flex sm:items-center flex-wrap sm:flex-row flex-col lg:px-5 pt-3 pb-4 justify-between border-b border-surface gap-4">
                 <div class="flex items-center gap-2">
                     <a
-                        v-styleclass="{
-                            selector: '#app-sidebar-14',
-                            enterFromClass: 'hidden',
-                            enterActiveClass: 'animate-fadeinleft',
-                            leaveToClass: 'hidden',
-                            leaveActiveClass: 'animate-fadeoutleft',
-                            hideOnOutsideClick: true
-                        }"
                         class="cursor-pointer block lg:hidden text-surface-700 dark:text-surface-100 mr-2"
+                        @click="$refs.sidebar?.toggle()"
                     >
-                        <i class="pi pi-bars text-3xl" />
+                        <UIcon name="i-heroicons-bars-3" class="text-3xl" />
                     </a>
                     <div class="flex-1">
                         <h1 class="text-lg font-medium text-surface-900 dark:text-surface-0">Dashboard</h1>
@@ -115,11 +108,12 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <IconField>
-                        <InputIcon class="pi pi-search" />
-                        <InputText v-model="search" placeholder="Search" />
-                    </IconField>
-                    <Button icon="pi pi-bell" outlined severity="secondary" />
+                    <UInput v-model="search" placeholder="Search">
+                        <template #leading>
+                            <UIcon name="i-heroicons-magnifying-glass" />
+                        </template>
+                    </UInput>
+                    <UButton icon="i-heroicons-bell" color="gray" variant="outline" />
                 </div>
             </div>
             <div class="flex-1 p-4 overflow-auto">
@@ -128,7 +122,7 @@
                     <div class="bg-surface-50 dark:bg-surface-900 rounded-xl p-4 shadow-sm border border-surface-100 dark:border-surface-800">
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Upcoming Appointments</h3>
-                            <i class="pi pi-calendar text-xl text-primary"></i>
+                            <UIcon name="i-heroicons-calendar-days" class="text-xl text-primary" />
                         </div>
                         <div class="text-3xl font-bold text-primary mb-2">{{ upcomingAppointments }}</div>
                         <div class="text-sm text-surface-600 dark:text-surface-400">
@@ -140,12 +134,12 @@
                     <div class="bg-surface-50 dark:bg-surface-900 rounded-xl p-4 shadow-sm border border-surface-100 dark:border-surface-800">
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Resource Utilization</h3>
-                            <i class="pi pi-briefcase text-xl text-cyan-500"></i>
+                            <UIcon name="i-heroicons-briefcase" class="text-xl text-cyan-500" />
                         </div>
                         <div class="text-3xl font-bold text-cyan-500 mb-2">{{ resourceUtilization }}%</div>
                         <div class="text-sm text-surface-600 dark:text-surface-400">
                             <span :class="resourceUtilizationChange >= 0 ? 'text-green-500' : 'text-red-500'">
-                                <i :class="resourceUtilizationChange >= 0 ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"></i>
+                                <UIcon :name="resourceUtilizationChange >= 0 ? 'i-heroicons-arrow-up' : 'i-heroicons-arrow-down'" />
                                 {{ Math.abs(resourceUtilizationChange) }}%
                             </span>
                             from last week
@@ -156,7 +150,7 @@
                     <div class="bg-surface-50 dark:bg-surface-900 rounded-xl p-4 shadow-sm border border-surface-100 dark:border-surface-800">
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Upcoming Absences</h3>
-                            <i class="pi pi-user-minus text-xl text-orange-500"></i>
+                            <UIcon name="i-heroicons-user-minus" class="text-xl text-orange-500" />
                         </div>
                         <div class="text-3xl font-bold text-orange-500 mb-2">{{ upcomingAbsences }}</div>
                         <div class="text-sm text-surface-600 dark:text-surface-400">
@@ -168,12 +162,12 @@
                     <div class="bg-surface-50 dark:bg-surface-900 rounded-xl p-4 shadow-sm border border-surface-100 dark:border-surface-800">
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Active Clients</h3>
-                            <i class="pi pi-users text-xl text-green-500"></i>
+                            <UIcon name="i-heroicons-users" class="text-xl text-green-500" />
                         </div>
                         <div class="text-3xl font-bold text-green-500 mb-2">{{ activeClients }}</div>
                         <div class="text-sm text-surface-600 dark:text-surface-400">
                             <span class="text-green-500">
-                                <i class="pi pi-plus"></i> {{ newClients }}
+                                <UIcon name="i-heroicons-plus" /> {{ newClients }}
                             </span>
                             new this month
                         </div>
@@ -186,8 +180,8 @@
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Appointments by Day</h3>
                             <div class="flex gap-2">
-                                <Button label="Week" size="small" :outlined="timeRange !== 'week'" :text="timeRange === 'week'" @click="timeRange = 'week'" />
-                                <Button label="Month" size="small" :outlined="timeRange !== 'month'" :text="timeRange === 'month'" @click="timeRange = 'month'" />
+                                <UButton label="Week" size="sm" :variant="timeRange !== 'week' ? 'outline' : 'solid'" @click="timeRange = 'week'" />
+                                <UButton label="Month" size="sm" :variant="timeRange !== 'month' ? 'outline' : 'solid'" @click="timeRange = 'month'" />
                             </div>
                         </div>
                         <div ref="appointmentsByDayChart" style="height: 300px;"></div>
@@ -197,7 +191,7 @@
                     <div class="bg-surface-50 dark:bg-surface-900 rounded-xl p-4 shadow-sm border border-surface-100 dark:border-surface-800">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Resource Utilization</h3>
-                            <Dropdown v-model="selectedResource" :options="resourceOptions" optionLabel="name" placeholder="Select Resource" class="w-48" />
+                            <USelect v-model="selectedResource" :options="resourceOptions" option-attribute="name" placeholder="Select Resource" class="w-48" />
                         </div>
                         <div ref="resourceUtilizationChart" style="height: 300px;"></div>
                     </div>
@@ -226,14 +220,8 @@
 </template>
 
 <script setup>
-import Avatar from 'primevue/avatar';
-import Button from 'primevue/button';
-import Dropdown from 'primevue/dropdown';
-import IconField from 'primevue/iconfield';
-import InputIcon from 'primevue/inputicon';
-import InputText from 'primevue/inputtext';
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
-import { useSupabaseClient, navigateTo } from '#imports';
+import { useSupabaseClient, navigateTo, useColorMode } from '#imports';
 import * as echarts from 'echarts';
 
 const supabase = useSupabaseClient();
@@ -282,6 +270,9 @@ const resourceOptions = ref([
     { id: 3, name: 'Equipment Set 1' },
     { id: 4, name: 'John Smith (Staff)' }
 ]);
+
+// Color mode composable for context7-style state
+const colorMode = useColorMode();
 
 // Fetch dashboard data
 const fetchDashboardData = async () => {

@@ -1,16 +1,41 @@
 <template>
   <div class="p-2">
+    <!-- Add Event Button -->
+    <div class="flex justify-end mb-4">
+      <button
+        @click="showEventForm = true"
+        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      >
+        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        Add Event
+      </button>
+    </div>
+
+    <!-- Event Form Modal -->
+    <div v-if="showEventForm" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <EventForm
+          :resources="resources"
+          :people="people"
+          @submit="handleEventSubmit"
+          @cancel="showEventForm = false"
+        />
+      </div>
+    </div>
+
     <!-- View Mode Switch -->
     <div class="p-4 flex justify-between items-center">
       <div class="flex gap-2 items-center">
-      <select v-model="viewMode" class="border p-1">
-        <option value="day">Day</option>
-        <option value="week">Week</option>
-        <option value="month">Month</option>
-      </select>
+        <select v-model="viewMode" class="border p-1 rounded">
+          <option value="day">Day</option>
+          <option value="week">Week</option>
+          <option value="month">Month</option>
+        </select>
       </div>
       <div class="flex-1 text-center text-lg font-semibold">
-      {{ formattedDateRange }}
+        {{ formattedDateRange }}
       </div>
     </div>
     <div class="ganttcontainer mx-auto p-0 bg-white" ref="ganttContainer">
@@ -21,7 +46,7 @@
                gridTemplateRows: gridTemplateRows
              }">
           <!-- Header Left Column -->
-          <div class="border-r bg-gray-50 border-b flex items-center justify-center sticky left-0 z-[500]" ref="headerRowEl">
+          <div class="border-r bg-gray-50 border-b flex items-center justify-center sticky left-0 top-0 z-[500]" ref="headerRowEl">
             <span class="text-black text-sm">People</span>
           </div>
 
@@ -72,15 +97,23 @@
 
           <!-- Task Bars -->
           <template v-for="(person, personIndex) in processedPeople" :key="person.id">
-            <div v-for="task in person.tasks" 
-                 :key="task.id"
-                 class="rounded-md shadow-sm relative z-[50] flex items-center"
-                 :style="getTaskStyle(personIndex, task)">
-              <div class="text-black text-xs p-1 truncate w-full">
+            <div 
+              v-for="task in person.tasks" 
+              :key="task.id"
+              class="rounded-md shadow-sm relative z-[50] flex flex-col justify-center cursor-pointer hover:shadow-md transition-shadow duration-200"
+              :style="getTaskStyle(personIndex, task)"
+              @click="openEventDetails(task)"
+            >
+              <div class="text-white text-xs p-1.5 truncate w-full font-medium">
                 {{ task.name }}
-                <div class="text-[10px] opacity-75">
-                  {{ formatTime(task.start) }} - {{ formatTime(task.end) }}
-                </div>
+              </div>
+              <div class="text-white text-[10px] px-1.5 pb-1 opacity-90">
+                {{ formatTime(task.start) }} - {{ formatTime(task.end) }}
+              </div>
+              <div v-if="task.attendees && task.attendees.length" class="flex items-center px-1.5 pb-1">
+                <span class="text-white text-[10px] opacity-75">
+                  {{ getAttendeeNames(task.attendees) }}
+                </span>
               </div>
             </div>
           </template>
@@ -116,7 +149,85 @@
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import EventForm from '~/components/scheduler/EventForm.vue';
+
 dayjs.extend(isSameOrAfter);
+
+// Mock data - replace with actual API calls
+const resources = ref([
+  { id: 1, name: 'Table 1', type: 'table' },
+  { id: 2, name: 'Table 2', type: 'table' },
+  { id: 3, name: 'Hair Stylist 1', type: 'staff' },
+  { id: 4, name: 'Hair Stylist 2', type: 'staff' },
+  { id: 5, name: 'Massage Room 1', type: 'room' },
+]);
+
+const people = ref([
+  { id: 1, name: 'John Doe', email: 'john@example.com', tasks: [
+    {
+      id: 101,
+      name: 'Morning Meeting',
+      start: dayjs().hour(9).minute(0).toDate(),
+      end: dayjs().hour(10).minute(0).toDate(),
+      color: '#3b82f6',
+      description: 'Discuss project updates',
+      attendees: [1, 2]
+    }
+  ] },
+  { id: 2, name: 'Jane Smith', email: 'jane@example.com', tasks: [
+    {
+      id: 102,
+      name: 'Client Call',
+      start: dayjs().hour(11).minute(0).toDate(),
+      end: dayjs().hour(12).minute(0).toDate(),
+      color: '#10b981',
+      description: 'Call with client',
+      attendees: [2, 3]
+    }
+  ] },
+  { id: 3, name: 'Bob Johnson', email: 'bob@example.com', tasks: [
+    {
+      id: 103,
+      name: 'Design Review',
+      start: dayjs().add(1, 'day').hour(14).minute(0).toDate(),
+      end: dayjs().add(1, 'day').hour(15).minute(0).toDate(),
+      color: '#f59e0b',
+      description: 'Review new designs',
+      attendees: [1, 3]
+    }
+  ] },
+]);
+
+const showEventForm = ref(false);
+
+// Handle event form submission
+const handleEventSubmit = (eventData) => {
+  // Add the new event to the appropriate resource
+  const resource = processedPeople.value.find(p => p.id === eventData.resourceId);
+  if (resource) {
+    const newEvent = {
+      id: Date.now(), // Generate a unique ID
+      name: eventData.title,
+      start: eventData.start,
+      end: eventData.end,
+      color: getRandomColor(),
+      description: eventData.description,
+      attendees: eventData.attendees
+    };
+    
+    resource.tasks.push(newEvent);
+    showEventForm.value = false;
+    
+    // Here you would typically make an API call to save the event
+    // await saveEventToDatabase(newEvent);
+  }
+};
+
+// Helper function to generate a random color for events
+const getRandomColor = () => {
+  const colors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+  return colors[Math.floor(Math.random() * colors.length)];
+};
 
 // View mode
 const viewMode = ref('month');
@@ -150,77 +261,6 @@ const leftColumnWidth = '12rem';
 const leftColumnWidthPx = 12 * 16; // Convert rem to pixels
 const ganttContainer = ref(null);
 const cellWidth = ref(40); // default value
-
-// Sample data
-const people = ref([
-  {
-    id: 1,
-    name: 'John Doe',
-    tasks: [
-      {
-        id: 1,
-        name: 'Design Sprint',
-        start: dayjs().hour(9).minute(30).toDate(),
-        end: dayjs().add(1, 'day').hour(15).minute(30).toDate(),
-        color: '#3b82f6'
-      },
-      {
-        id: 2,
-        name: 'Client Meeting',
-        start: dayjs().hour(11).minute(0).toDate(),
-        end: dayjs().hour(12).minute(30).toDate(),
-        color: '#f59e0b'
-      }
-    ]
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    tasks: [
-      {
-        id: 1,
-        name: 'Some Stuff',
-        start: dayjs().hour(14).minute(0).toDate(),
-        end: dayjs().hour(16).minute(45).toDate(),
-        color: '#10b981'
-      },
-      {
-        id: 2,
-        name: 'Laters',
-        start: dayjs().add(5, 'day').hour(10).minute(0).toDate(),
-        end: dayjs().add(7, 'day').hour(11).minute(45).toDate(),
-        color: '#10b981'
-      }
-    ]
-  },
-  {
-    id: 3,
-    name: 'Sean Keane',
-    tasks: [
-      {
-        id: 7,
-        name: 'Bananagrams',
-        start: dayjs().hour(14).minute(0).toDate(),
-        end: dayjs().hour(16).minute(45).toDate(),
-        color: '#10b981'
-      },
-      {
-        id: 8,
-        name: 'Chillax',
-        start: dayjs().add(1, 'day').hour(2).minute(0).toDate(),
-        end: dayjs().add(1, 'day').hour(3).minute(10).toDate(),
-        color: '#10b981'
-      },
-      {
-        id: 9,
-        name: 'Hurricane',
-        start: dayjs().add(2, 'day').hour(3).minute(0).toDate(),
-        end: dayjs().add(2, 'day').hour(4).minute(10).toDate(),
-        color: '#FF5733'
-      }
-    ]
-  }
-]);
 
 // Process people tasks for lane calculations (remains the same)
 const processedPeople = computed(() => {
@@ -344,6 +384,26 @@ const getTaskStyle = (personIndex, task) => {
       height: '40px'
     };
   }
+};
+
+// Helper function to get attendee names
+const getAttendeeNames = (attendeeIds) => {
+  return attendeeIds
+    .map(id => {
+      const person = people.value.find(p => p.id === id);
+      return person ? person.name.split(' ')[0] : '';
+    })
+    .filter(Boolean)
+    .join(', ');
+};
+
+// Open event details modal
+const openEventDetails = (event) => {
+  // In a real app, you would open a modal with full event details
+  alert(`Event: ${event.name}\n\n` +
+        `Time: ${formatTime(event.start)} - ${formatTime(event.end)}\n` +
+        `Description: ${event.description || 'No description'}\n` +
+        `Attendees: ${getAttendeeNames(event.attendees || [])}`);
 };
 
 // Helper functions for header styling and formatting

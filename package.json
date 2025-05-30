@@ -22,7 +22,7 @@
     "@unhead/vue": "^2.0.0-rc.8",
     "@unlok-co/nuxt-stripe": "^5.0.0",
     "@vue-email/components": "^0.0.21",
-    "@vuepic/vue-datepicker": "^11.0.0",
+    "@vuepic/vue-datepicker": "^11.0.2",
     "@vueuse/nuxt": "^13.0.0",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.7",
