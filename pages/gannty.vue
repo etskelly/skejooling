@@ -346,42 +346,42 @@ const rowPositions = computed(() => {
 const getTaskStyle = (personIndex, task) => {
   const taskStart = dayjs(task.start);
   const taskEnd = dayjs(task.end);
-  
+  const rowHeight = processedPeople.value[personIndex]?.rowHeight || 50;
   if (viewMode.value === 'day') {
     // Clip start and end times to timeline boundaries
     const effectiveStart = taskStart.isAfter(timelineStart.value) ? taskStart : timelineStart.value;
     const effectiveEnd = taskEnd.isBefore(timelineEnd.value) ? taskEnd : timelineEnd.value;
-    
     const startDiffHours = effectiveStart.diff(timelineStart.value, 'hour', true);
     const durationHours = effectiveEnd.diff(effectiveStart, 'hour', true);
     const left = startDiffHours * cellWidth.value + leftColumnWidthPx;
     const width = durationHours * cellWidth.value;
-    
     return {
       position: 'absolute',
-      top: `${rowPositions.value[personIndex] + (task.lane * 50)}px`,
+      top: `${rowPositions.value[personIndex] + (task.lane * rowHeight)}px`,
       left: `${left}px`,
       width: `${width}px`,
       backgroundColor: task.color,
-      height: '40px'
+      height: `${rowHeight}px`,
+      display: 'flex',
+      alignItems: 'center'
     };
   } else {
     // Clip start and end times to timeline boundaries
     const effectiveStart = taskStart.isAfter(timelineStart.value) ? taskStart : timelineStart.value;
     const effectiveEnd = taskEnd.isBefore(timelineEnd.value) ? taskEnd : timelineEnd.value;
-    
     const startDiffDays = effectiveStart.diff(timelineStart.value, 'day', true);
     const durationDays = effectiveEnd.diff(effectiveStart, 'day', true);
     const left = startDiffDays * cellWidth.value + leftColumnWidthPx;
     const width = durationDays * cellWidth.value;
-    
     return {
       position: 'absolute',
-      top: `${rowPositions.value[personIndex] + (task.lane * 50)}px`,
+      top: `${rowPositions.value[personIndex] + (task.lane * rowHeight)}px`,
       left: `${left}px`,
       width: `${width}px`,
       backgroundColor: task.color,
-      height: '40px'
+      height: `${rowHeight}px`,
+      display: 'flex',
+      alignItems: 'center'
     };
   }
 };
